@@ -8,4 +8,5 @@ libethstatscmd_la_LDFLAGS = \
 	-lstdc++fs \
 	-version-info 0:0:0 -shared
 
-libethstatscmd_la_CXXFLAGS =
+libethstatscmd_la_CXXFLAGS = \
+	-flto
