@@ -90,7 +90,7 @@ static ipmi_ret_t HandleEthStatCommand(ipmi_cmd_t cmd, const uint8_t* reqBuf,
     {
         std::fprintf(stderr, "*dataLen too small: %u\n",
                      static_cast<uint32_t>(reqLength));
-        return IPMI_CC_INVALID;
+        return IPMI_CC_REQ_DATA_LEN_INVALID;
     }
 
     // using struct prefix due to nature as c-style pod struct.
@@ -102,7 +102,7 @@ static ipmi_ret_t HandleEthStatCommand(ipmi_cmd_t cmd, const uint8_t* reqBuf,
     {
         std::fprintf(stderr, "*dataLen too small: %u\n",
                      static_cast<uint32_t>(reqLength));
-        return IPMI_CC_INVALID;
+        return IPMI_CC_REQ_DATA_LEN_INVALID;
     }
 
     // Check the statistic to see if we recognize it.
@@ -133,7 +133,7 @@ static ipmi_ret_t HandleEthStatCommand(ipmi_cmd_t cmd, const uint8_t* reqBuf,
     if (name.find("/") != std::string::npos)
     {
         std::fprintf(stderr, "Invalid or illegal name: '%s'\n", name.c_str());
-        return IPMI_CC_INVALID;
+        return IPMI_CC_INVALID_FIELD_REQUEST;
     }
 
     // TODO: Transition to using the netlink api.
@@ -145,7 +145,7 @@ static ipmi_ret_t HandleEthStatCommand(ipmi_cmd_t cmd, const uint8_t* reqBuf,
     if (!fs::exists(path, ec))
     {
         std::fprintf(stderr, "Path: '%s' doesn't exist.\n", path.c_str());
-        return IPMI_CC_INVALID;
+        return IPMI_CC_INVALID_FIELD_REQUEST;
     }
     // We're uninterested in the state of ec.
 
@@ -163,7 +163,7 @@ static ipmi_ret_t HandleEthStatCommand(ipmi_cmd_t cmd, const uint8_t* reqBuf,
     }
     catch (std::ios_base::failure& fail)
     {
-        return IPMI_CC_INVALID;
+        return IPMI_CC_UNSPECIFIED_ERROR;
     }
 
     struct EthStatReply reply;
