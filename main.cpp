@@ -25,16 +25,11 @@
 #include <experimental/filesystem>
 #include <fstream>
 #include <host-ipmid/iana.hpp>
+#include <host-ipmid/oemopenbmc.hpp>
 #include <host-ipmid/oemrouter.hpp>
 #include <map>
 #include <sstream>
 #include <string>
-
-/* TODO: Swap out once https://gerrit.openbmc-project.xyz/12958 is merged */
-namespace oem
-{
-constexpr auto ethStatsCmd = 48;
-} // namespace oem
 
 namespace ethstats
 {
@@ -187,17 +182,17 @@ void setupGlobalOemEthStats()
     /* Install in Google OEM Namespace when enabled. */
     std::fprintf(stderr,
                  "Registering OEM:[%#08X], Cmd:[%#04X] for Ethstats Commands\n",
-                 oem::googOemNumber, oem::ethStatsCmd);
+                 oem::googOemNumber, oem::Cmd::ethStatsCmd);
 
-    oemRouter->registerHandler(oem::googOemNumber, oem::ethStatsCmd,
+    oemRouter->registerHandler(oem::googOemNumber, oem::Cmd::ethStatsCmd,
                                HandleEthStatCommand);
 #endif
 
     std::fprintf(stderr,
                  "Registering OEM:[%#08X], Cmd:[%#04X] for Ethstats Commands\n",
-                 oem::obmcOemNumber, oem::ethStatsCmd);
+                 oem::obmcOemNumber, oem::Cmd::ethStatsCmd);
 
-    oemRouter->registerHandler(oem::obmcOemNumber, oem::ethStatsCmd,
+    oemRouter->registerHandler(oem::obmcOemNumber, oem::Cmd::ethStatsCmd,
                                HandleEthStatCommand);
 }
 
