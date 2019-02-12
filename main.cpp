@@ -18,15 +18,15 @@
 
 #include "ethstats.hpp"
 
-#include <host-ipmid/ipmid-api.h>
+#include <ipmid/api.h>
 
 #include <cstdint>
 #include <cstring>
 #include <experimental/filesystem>
 #include <fstream>
-#include <host-ipmid/iana.hpp>
-#include <host-ipmid/oemopenbmc.hpp>
-#include <host-ipmid/oemrouter.hpp>
+#include <ipmid/iana.hpp>
+#include <ipmid/oemopenbmc.hpp>
+#include <ipmid/oemrouter.hpp>
 #include <map>
 #include <sstream>
 #include <string>

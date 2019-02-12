@@ -5,8 +5,10 @@ libethstatscmd_LTLIBRARIES = libethstatscmd.la
 libethstatscmd_la_SOURCES = main.cpp
 
 libethstatscmd_la_LDFLAGS = \
+	$(LIBIPMID_LIBS) \
 	-lstdc++fs \
 	-version-info 0:0:0 -shared
 
 libethstatscmd_la_CXXFLAGS = \
+	$(LIBIPMID_CFLAGS) \
 	-flto
