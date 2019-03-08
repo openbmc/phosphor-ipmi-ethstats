@@ -12,7 +12,6 @@ struct EthStatRequest
 {
     uint8_t statId;
     uint8_t if_name_len;
-    uint8_t if_name[0];
 } __attribute__((packed));
 
 /**
