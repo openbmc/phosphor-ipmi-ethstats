@@ -71,7 +71,8 @@ static const std::map<uint8_t, std::string> statLookup = {
  * @param[in,out] dataLen - The length of the request and reply.
  * @return the IPMI result code.
  */
-static ipmi_ret_t HandleEthStatCommand(ipmi_cmd_t cmd, const uint8_t* reqBuf,
+static ipmi_ret_t HandleEthStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
+                                       const uint8_t* reqBuf,
                                        uint8_t* replyCmdBuf, size_t* dataLen)
 {
     auto reqLength = (*dataLen);
