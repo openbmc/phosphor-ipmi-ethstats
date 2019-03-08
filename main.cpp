@@ -178,7 +178,7 @@ void setupGlobalOemEthStats()
 {
     oem::Router* oemRouter = oem::mutableRouter();
 
-#ifdef ENABLE_GOOGLE
+#if ENABLE_GOOGLE
     /* Install in Google OEM Namespace when enabled. */
     std::fprintf(stderr,
                  "Registering OEM:[%#08X], Cmd:[%#04X] for Ethstats Commands\n",
