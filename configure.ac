@@ -25,12 +25,14 @@ LT_INIT # Required for systemd linking
 
 # Do you want to install with the Google OEM Number as well.
 AC_ARG_ENABLE([google],
-    AS_HELP_STRING([--enable-google], [Enable registering with Google OEN])
+    AS_HELP_STRING(
+        [--enable-google], [Enable registering with Google OEN.]
+    )
 )
-AC_ARG_VAR(ENABLE_GOOGLE, [Enable registering with Google OEN])
-AS_IF([test "x$enable_google" == "xyes"],
-      [ENABLE_GOOGLE="yes"]
-      AC_DEFINE_UNQUOTED([ENABLE_GOOGLE], ["$ENABLE_GOOGLE"], [Enable registering with Google OEN])
+AM_CONDITIONAL(ENABLE_GOOGLE, [test "x$enable_google" = "xyes"])
+AS_IF([test "x$enable_google" = "xyes"],
+    [AC_DEFINE(ENABLE_GOOGLE, [1], [Register with Google OEN.])],
+    [AC_DEFINE(ENABLE_GOOGLE, [0], [Do not register with Google OEN.])]
 )
 
 # Create configured output
