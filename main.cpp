@@ -22,7 +22,7 @@
 
 #include <cstdint>
 #include <cstring>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <fstream>
 #include <ipmid/iana.hpp>
 #include <ipmid/oemopenbmc.hpp>
@@ -33,7 +33,7 @@
 
 namespace ethstats
 {
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 // If this changes in the future, there should be some alternative
 // source for the information if possible to provide continuined functionality.
