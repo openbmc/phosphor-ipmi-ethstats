@@ -12,3 +12,5 @@ libethstatscmd_la_LDFLAGS = \
 libethstatscmd_la_CXXFLAGS = \
 	$(LIBIPMID_CFLAGS) \
 	-flto
+
+SUBDIRS = . test
