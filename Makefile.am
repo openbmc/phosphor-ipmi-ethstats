@@ -2,7 +2,7 @@ AM_DEFAULT_SOURCE_EXT = .cpp
 
 libethstatscmddir = ${libdir}/ipmid-providers
 libethstatscmd_LTLIBRARIES = libethstatscmd.la
-libethstatscmd_la_SOURCES = main.cpp
+libethstatscmd_la_SOURCES = main.cpp ethstats.cpp
 
 libethstatscmd_la_LDFLAGS = \
 	$(LIBIPMID_LIBS) \
