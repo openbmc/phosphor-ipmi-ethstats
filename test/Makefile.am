@@ -10,3 +10,8 @@ AM_LDFLAGS = \
 
 check_PROGRAMS =
 TESTS = $(check_PROGRAMS)
+
+check_PROGRAMS += ethstats_unittest
+ethstats_unittest_SOURCES = ethstats_unittest.cpp
+ethstats_unittest_LDADD = $(top_builddir)/libethstatscmd.la
+
