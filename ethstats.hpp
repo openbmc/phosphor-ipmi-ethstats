@@ -1,5 +1,7 @@
 #pragma once
 
+#include "handler.hpp"
+
 #include <ipmid/api.h>
 
 #include <cstdint>
@@ -54,14 +56,14 @@ enum EthernetStatisticsIds
 /**
  * Handle the OEM IPMI EthStat Command.
  *
- * @param[in] cmd - the OEM command.
  * @param[in] reqBuf - the IPMI request buffer.
  * @param[in,out] replyCmdBuf - the IPMI reply buffer.
  * @param[in,out] dataLen - the length of the request and reply.
+ * @param[in] handler - pointer to ethstats implementation.
  * @return the IPMI result code.
  */
-ipmi_ret_t handleEthStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
-                                const std::uint8_t* reqBuf,
-                                std::uint8_t* replyCmdBuf, size_t* dataLen);
+ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
+                                std::uint8_t* replyCmdBuf, size_t* dataLen,
+                                const EthStatsInterface* handler = &handler);
 
 } // namespace ethstats
