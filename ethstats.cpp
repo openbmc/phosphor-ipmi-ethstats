@@ -16,21 +16,19 @@
 
 #include "ethstats.hpp"
 
+#include "handler.hpp"
+
 #include <ipmid/api.h>
 
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <filesystem>
-#include <fstream>
 #include <map>
 #include <sstream>
 #include <string>
 
 namespace ethstats
 {
-namespace fs = std::filesystem;
-
 // If this changes in the future, there should be some alternative
 // source for the information if possible to provide continuined functionality.
 static const std::map<std::uint8_t, std::string> statLookup = {
@@ -58,9 +56,17 @@ static const std::map<std::uint8_t, std::string> statLookup = {
     {TX_WINDOW_ERRORS, "tx_window_errors"},
 };
 
-ipmi_ret_t handleEthStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
-                                const std::uint8_t* reqBuf,
-                                std::uint8_t* replyCmdBuf, size_t* dataLen)
+std::string buildPath(const std::string& ifName, const std::string& field)
+{
+    std::ostringstream opath;
+    opath << "/sys/class/net/" << ifName << "/statistics/" << field;
+
+    return opath.str();
+}
+
+ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
+                                std::uint8_t* replyCmdBuf, size_t* dataLen,
+                                const EthStatsInterface* handler)
 {
     auto reqLength = (*dataLen);
 
@@ -119,39 +125,16 @@ ipmi_ret_t handleEthStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
         return IPMI_CC_INVALID_FIELD_REQUEST;
     }
 
-    // TODO: Transition to using the netlink api.
-    std::ostringstream opath;
-    opath << "/sys/class/net/" << name << "/statistics/" << stat->second;
-    std::string path = opath.str();
+    std::string fullPath = buildPath(name, stat->second);
 
-    std::error_code ec;
-    if (!fs::exists(path, ec))
+    if (!handler->validIfNameAndField(fullPath))
     {
-        std::fprintf(stderr, "Path: '%s' doesn't exist.\n", path.c_str());
         return IPMI_CC_INVALID_FIELD_REQUEST;
-    }
-    // We're uninterested in the state of ec.
-
-    // Read the file and check the result.
-    // We read the number as int64, then check to make sure it's positive
-    // before casting to uint64.
-    std::uint64_t value = 0;
-    std::ifstream ifs;
-    ifs.exceptions(std::ifstream::failbit);
-
-    try
-    {
-        ifs.open(path);
-        ifs >> value;
-    }
-    catch (std::ios_base::failure& fail)
-    {
-        return IPMI_CC_UNSPECIFIED_ERROR;
     }
 
     struct EthStatReply reply;
     reply.statId = request.statId;
-    reply.value = value;
+    reply.value = handler->readStatistic(fullPath);
 
     // Store the result.
     std::memcpy(&replyCmdBuf[0], &reply, sizeof(reply));

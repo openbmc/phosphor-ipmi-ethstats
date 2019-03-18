@@ -1,8 +1,11 @@
 #pragma once
 
+#include "handler.hpp"
+
 #include <ipmid/api.h>
 
 #include <cstdint>
+#include <string>
 
 namespace ethstats
 {
@@ -54,14 +57,24 @@ enum EthernetStatisticsIds
 /**
  * Handle the OEM IPMI EthStat Command.
  *
- * @param[in] cmd - the OEM command.
  * @param[in] reqBuf - the IPMI request buffer.
  * @param[in,out] replyCmdBuf - the IPMI reply buffer.
  * @param[in,out] dataLen - the length of the request and reply.
+ * @param[in] handler - pointer to ethstats implementation.
  * @return the IPMI result code.
  */
-ipmi_ret_t handleEthStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
-                                const std::uint8_t* reqBuf,
-                                std::uint8_t* replyCmdBuf, size_t* dataLen);
+ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
+                                std::uint8_t* replyCmdBuf, size_t* dataLen,
+                                const EthStatsInterface* handler = &handler);
+
+/**
+ * Given an ethernet if_name and a field, build the full path.
+ *
+ * @param[in] ifName - the ethernet interface's name.
+ * @param[in] field - the name of the statistic
+ * @return the full path of the file to read for the statistic for that
+ * interface name.
+ */
+std::string buildPath(const std::string& ifName, const std::string& field);
 
 } // namespace ethstats
