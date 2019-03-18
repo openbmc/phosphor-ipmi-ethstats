@@ -16,6 +16,8 @@
 
 #include "ethstats.hpp"
 
+#include "handler.hpp"
+
 #include <ipmid/api.h>
 
 #include <cstdint>
@@ -58,9 +60,9 @@ static const std::map<std::uint8_t, std::string> statLookup = {
     {TX_WINDOW_ERRORS, "tx_window_errors"},
 };
 
-ipmi_ret_t handleEthStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
-                                const std::uint8_t* reqBuf,
-                                std::uint8_t* replyCmdBuf, size_t* dataLen)
+ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
+                                std::uint8_t* replyCmdBuf, size_t* dataLen,
+                                const EthStatsInterface* handler)
 {
     auto reqLength = (*dataLen);
 
