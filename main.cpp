@@ -23,6 +23,18 @@
 #include <ipmid/oemopenbmc.hpp>
 #include <ipmid/oemrouter.hpp>
 
+namespace ethstats
+{
+
+static ipmi_ret_t ethStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
+                                 const uint8_t* reqBuf, uint8_t* replyCmdBuf,
+                                 size_t* dataLen)
+{
+    return handleEthStatCommand(reqBuf, replyCmdBuf, dataLen);
+}
+
+} // namespace ethstats
+
 void setupGlobalOemEthStats() __attribute__((constructor));
 
 void setupGlobalOemEthStats()
@@ -36,7 +48,7 @@ void setupGlobalOemEthStats()
                  oem::googOemNumber, oem::Cmd::ethStatsCmd);
 
     oemRouter->registerHandler(oem::googOemNumber, oem::Cmd::ethStatsCmd,
-                               ethstats::handleEthStatCommand);
+                               ethstats::ethStatCommand);
 #endif
 
     std::fprintf(stderr,
@@ -44,5 +56,5 @@ void setupGlobalOemEthStats()
                  oem::obmcOemNumber, oem::Cmd::ethStatsCmd);
 
     oemRouter->registerHandler(oem::obmcOemNumber, oem::Cmd::ethStatsCmd,
-                               ethstats::handleEthStatCommand);
+                               ethstats::ethStatCommand);
 }
