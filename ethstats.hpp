@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ipmid/api.h>
+
 #include <cstdint>
 
 namespace ethstats
@@ -10,8 +12,8 @@ namespace ethstats
  */
 struct EthStatRequest
 {
-    uint8_t statId;
-    uint8_t if_name_len;
+    std::uint8_t statId;
+    std::uint8_t if_name_len;
 } __attribute__((packed));
 
 /**
@@ -19,8 +21,8 @@ struct EthStatRequest
  */
 struct EthStatReply
 {
-    uint8_t statId;
-    uint64_t value;
+    std::uint8_t statId;
+    std::uint64_t value;
 } __attribute__((packed));
 
 enum EthernetStatisticsIds
@@ -48,5 +50,18 @@ enum EthernetStatisticsIds
     TX_PACKETS = 20,
     TX_WINDOW_ERRORS = 21,
 };
+
+/**
+ * Handle the OEM IPMI EthStat Command.
+ *
+ * @param[in] cmd - the OEM command.
+ * @param[in] reqBuf - the IPMI request buffer.
+ * @param[in,out] replyCmdBuf - the IPMI reply buffer.
+ * @param[in,out] dataLen - the length of the request and reply.
+ * @return the IPMI result code.
+ */
+ipmi_ret_t handleEthStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
+                                const std::uint8_t* reqBuf,
+                                std::uint8_t* replyCmdBuf, size_t* dataLen);
 
 } // namespace ethstats
