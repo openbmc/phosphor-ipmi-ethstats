@@ -3,6 +3,13 @@
 
 # http://www.gnu.org/software/automake
 
+
+# Code Coverage
+*.gcda
+*.gcno
+*.trs
+*-coverage*
+
 Makefile.in
 /ar-lib
 /mdate-sh
@@ -12,6 +19,7 @@ Makefile.in
 
 # http://www.gnu.org/software/autoconf
 
+/aminclude_static.am
 /autom4te.cache
 /autoscan.log
 /autoscan-*.log
