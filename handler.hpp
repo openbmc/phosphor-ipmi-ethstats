@@ -36,6 +36,4 @@ class EthStats : public EthStatsInterface
     std::uint64_t readStatistic(const std::string& path) const override;
 };
 
-extern EthStats handler;
-
 } // namespace ethstats

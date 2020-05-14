@@ -65,7 +65,7 @@ enum EthernetStatisticsIds
  */
 ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
                                 std::uint8_t* replyCmdBuf, size_t* dataLen,
-                                const EthStatsInterface* handler = &handler);
+                                const EthStatsInterface* handler);
 
 /**
  * Given an ethernet if_name and a field, build the full path.

@@ -53,6 +53,4 @@ std::uint64_t EthStats::readStatistic(const std::string& path) const
     return value;
 }
 
-EthStats handler;
-
 } // namespace ethstats

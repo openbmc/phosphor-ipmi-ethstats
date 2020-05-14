@@ -26,11 +26,13 @@
 namespace ethstats
 {
 
+EthStats handler;
+
 static ipmi_ret_t ethStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
                                  const uint8_t* reqBuf, uint8_t* replyCmdBuf,
                                  size_t* dataLen)
 {
-    return handleEthStatCommand(reqBuf, replyCmdBuf, dataLen);
+    return handleEthStatCommand(reqBuf, replyCmdBuf, dataLen, &handler);
 }
 
 } // namespace ethstats
