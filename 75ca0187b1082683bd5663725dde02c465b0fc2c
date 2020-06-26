@@ -1,0 +1,9 @@
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+1: Benjamin Fair <benjaminfair@google.com>
+Code-Review+2: William A. Kennington III <wak@google.com>
+Submitted-by: Patrick Venture <venture@google.com>
+Submitted-at: Fri, 26 Jun 2020 14:12:50 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/phosphor-ipmi-ethstats/+/32349
+Project: openbmc/phosphor-ipmi-ethstats
+Branch: refs/heads/master
