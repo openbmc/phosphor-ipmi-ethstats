@@ -119,7 +119,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     // Basically you can't easily inject ../ or /../ into the path below.
     // Decided to make this more robust, although since it appends to the path
     // it would limit any exposure.
-    if (name.find("/") != std::string::npos)
+    if (name.find('/') != std::string::npos)
     {
         std::fprintf(stderr, "Invalid or illegal name: '%s'\n", name.c_str());
         return IPMI_CC_INVALID_FIELD_REQUEST;
