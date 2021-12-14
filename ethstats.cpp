@@ -23,7 +23,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <ipmid/message.hpp>
 #include <map>
+#include <span>
 #include <sstream>
 #include <string>
 
@@ -64,34 +66,29 @@ std::string buildPath(const std::string& ifName, const std::string& field)
     return opath.str();
 }
 
-ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
-                                std::uint8_t* replyCmdBuf, size_t* dataLen,
-                                const EthStatsInterface* handler)
+Resp handleEthStatCommand(ipmi::Context::ptr, uint8_t statId, uint8_t length,
+                          std::span<const uint8_t> data,
+                          const EthStatsInterface* handler)
 {
-    auto reqLength = (*dataLen);
-
-    // Verify the reqBuf is the minimum length.
+    // Verify the data is the minimum length.
     // [0] == statistics id
     // [1] == if_name_length
     // [2..N] == if_name
     // In theory the smallest can be a one-letter name. (3 bytes).
-    if (reqLength < sizeof(struct EthStatRequest) + sizeof(std::uint8_t))
-    {
-        std::fprintf(stderr, "*dataLen too small: %u\n",
-                     static_cast<std::uint32_t>(reqLength));
-        return IPMI_CC_REQ_DATA_LEN_INVALID;
-    }
+    // The New Handler is guranteed to have the required inputs
 
     // using struct prefix due to nature as c-style pod struct.
-    struct EthStatRequest request;
-    std::memcpy(&request, &reqBuf[0], sizeof(request));
+    struct EthStatRequest request
+    {
+        statId, length
+    };
     auto nameLen = static_cast<std::uint32_t>(request.if_name_len);
 
-    if (reqLength < (sizeof(request) + nameLen))
+    if (data.size() < nameLen)
     {
         std::fprintf(stderr, "*dataLen too small: %u\n",
-                     static_cast<std::uint32_t>(reqLength));
-        return IPMI_CC_REQ_DATA_LEN_INVALID;
+                     static_cast<std::uint32_t>(data.size()));
+        return ipmi::responseReqDataLenInvalid();
     }
 
     // Check the statistic to see if we recognize it.
@@ -99,7 +96,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     if (stat == statLookup.end())
     {
         std::fprintf(stderr, "stat not known: 0x%x\n", request.statId);
-        return IPMI_CC_INVALID_FIELD_REQUEST;
+        return ipmi::responseInvalidFieldRequest();
     }
 
     // The if_name handling plus a few other things was taken from the
@@ -110,8 +107,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
 
     // Copy the string out of the request buffer.
     // Maximum length is 256 bytes, excluding the nul-terminator.
-    auto name = std::string(
-        reinterpret_cast<const char*>(&reqBuf[0] + sizeof(request)), nameLen);
+    auto name = std::string(data.data(), data.data() + nameLen);
 
     // Minor sanity & security check (of course, I'm less certain if unicode
     // comes into play here.
@@ -122,25 +118,18 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     if (name.find('/') != std::string::npos)
     {
         std::fprintf(stderr, "Invalid or illegal name: '%s'\n", name.c_str());
-        return IPMI_CC_INVALID_FIELD_REQUEST;
+        return ipmi::responseInvalidFieldRequest();
     }
 
     std::string fullPath = buildPath(name, stat->second);
 
     if (!handler->validIfNameAndField(fullPath))
     {
-        return IPMI_CC_INVALID_FIELD_REQUEST;
+        return ipmi::responseInvalidFieldRequest();
     }
 
-    struct EthStatReply reply;
-    reply.statId = request.statId;
-    reply.value = handler->readStatistic(fullPath);
-
-    // Store the result.
-    std::memcpy(&replyCmdBuf[0], &reply, sizeof(reply));
-    (*dataLen) = sizeof(reply);
-
-    return IPMI_CC_OK;
+    return ipmi::responseSuccess(request.statId,
+                                 handler->readStatistic(fullPath));
 }
 
 } // namespace ethstats
