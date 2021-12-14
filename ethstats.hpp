@@ -4,11 +4,18 @@
 
 #include <ipmid/api.h>
 
+#include <ipmid/api-types.hpp>
+#include <ipmid/message.hpp>
+
 #include <cstdint>
+#include <span>
 #include <string>
+#include <vector>
 
 namespace ethstats
 {
+
+using Resp = ::ipmi::RspType<std::uint8_t, std::uint64_t>;
 
 /**
  * @brief Ethstat Request structure.
@@ -57,14 +64,13 @@ enum EthernetStatisticsIds
 /**
  * Handle the OEM IPMI EthStat Command.
  *
- * @param[in] reqBuf - the IPMI request buffer.
- * @param[in,out] replyCmdBuf - the IPMI reply buffer.
- * @param[in,out] dataLen - the length of the request and reply.
+ * @param[in] statId - Stat Id of the request.
+ * @param[in] data - Read of the ipmi payload.
  * @param[in] handler - pointer to ethstats implementation.
  * @return the IPMI result code.
  */
-ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
-                                std::uint8_t* replyCmdBuf, size_t* dataLen,
-                                const EthStatsInterface* handler);
+Resp handleEthStatCommand(uint8_t statId, uint8_t length,
+                          std::span<const uint8_t> data,
+                          const EthStatsInterface* handler);
 
 } // namespace ethstats
