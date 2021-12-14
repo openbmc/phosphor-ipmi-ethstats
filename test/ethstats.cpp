@@ -27,19 +27,13 @@ TEST(EthStatsTest, InvalidStatReturnsFailure)
     requestStruct.statId = EthernetStatisticsIds::TX_WINDOW_ERRORS + 1;
     requestStruct.if_name_len = ifName.length();
 
-    std::vector<std::uint8_t> request(sizeof(requestStruct) + ifName.length());
-    std::memcpy(request.data(), &requestStruct, sizeof(requestStruct));
-    std::memcpy(&request[sizeof(requestStruct)], ifName.c_str(),
-                ifName.length());
-
-    size_t dataLen = request.size();
-    std::uint8_t reply[MAX_IPMI_BUFFER];
-
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_INVALID_FIELD_REQUEST,
-              handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
+    EXPECT_EQ(ipmi::responseInvalidFieldRequest(),
+              handleEthStatCommand(
+                  requestStruct.statId, requestStruct.if_name_len,
+                  std::vector<uint8_t>(ifName.begin(), ifName.end()), &hMock));
 }
 
 TEST(EthStatsTest, InvalidIpmiPacketSize)
@@ -51,21 +45,17 @@ TEST(EthStatsTest, InvalidIpmiPacketSize)
     requestStruct.statId = EthernetStatisticsIds::RX_BYTES;
     requestStruct.if_name_len = ifName.length();
 
-    std::vector<std::uint8_t> request(sizeof(requestStruct) + ifName.length());
-    std::memcpy(request.data(), &requestStruct, sizeof(requestStruct));
-    std::memcpy(&request[sizeof(requestStruct)], ifName.c_str(),
-                ifName.length());
-
     // The minimum length is a 1-byte ifname - this gives one, but dataLen is
     // set to smaller.
-    size_t dataLen = request.size() - 1;
-    std::uint8_t reply[MAX_IPMI_BUFFER];
+    ifName.pop_back();
 
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_REQ_DATA_LEN_INVALID,
-              handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
+    EXPECT_EQ(ipmi::responseReqDataLenInvalid(),
+              handleEthStatCommand(
+                  requestStruct.statId, requestStruct.if_name_len,
+                  std::vector<uint8_t>(ifName.begin(), ifName.end()), &hMock));
 }
 
 TEST(EthStatsTest, InvalidIpmiPacketContents)
@@ -78,19 +68,13 @@ TEST(EthStatsTest, InvalidIpmiPacketContents)
     requestStruct.statId = EthernetStatisticsIds::RX_BYTES;
     requestStruct.if_name_len = ifName.length() + 1;
 
-    std::vector<std::uint8_t> request(sizeof(requestStruct) + ifName.length());
-    std::memcpy(request.data(), &requestStruct, sizeof(requestStruct));
-    std::memcpy(&request[sizeof(requestStruct)], ifName.c_str(),
-                ifName.length());
-
-    size_t dataLen = request.size();
-    std::uint8_t reply[MAX_IPMI_BUFFER];
-
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_REQ_DATA_LEN_INVALID,
-              handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
+    EXPECT_EQ(ipmi::responseReqDataLenInvalid(),
+              handleEthStatCommand(
+                  requestStruct.statId, requestStruct.if_name_len,
+                  std::vector<uint8_t>(ifName.begin(), ifName.end()), &hMock));
 }
 
 TEST(EthStatsTest, NameHasIllegalCharacters)
@@ -101,19 +85,13 @@ TEST(EthStatsTest, NameHasIllegalCharacters)
     requestStruct.statId = EthernetStatisticsIds::RX_BYTES;
     requestStruct.if_name_len = ifName.length();
 
-    std::vector<std::uint8_t> request(sizeof(requestStruct) + ifName.length());
-    std::memcpy(request.data(), &requestStruct, sizeof(requestStruct));
-    std::memcpy(&request[sizeof(requestStruct)], ifName.c_str(),
-                ifName.length());
-
-    size_t dataLen = request.size();
-    std::uint8_t reply[MAX_IPMI_BUFFER];
-
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_INVALID_FIELD_REQUEST,
-              handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
+    EXPECT_EQ(ipmi::responseInvalidFieldRequest(),
+              handleEthStatCommand(
+                  requestStruct.statId, requestStruct.if_name_len,
+                  std::vector<uint8_t>(ifName.begin(), ifName.end()), &hMock));
 }
 
 TEST(EthStatsTest, InvalidNameOrField)
@@ -124,22 +102,16 @@ TEST(EthStatsTest, InvalidNameOrField)
     requestStruct.statId = EthernetStatisticsIds::RX_BYTES;
     requestStruct.if_name_len = ifName.length();
 
-    std::vector<std::uint8_t> request(sizeof(requestStruct) + ifName.length());
-    std::memcpy(request.data(), &requestStruct, sizeof(requestStruct));
-    std::memcpy(&request[sizeof(requestStruct)], ifName.c_str(),
-                ifName.length());
-
-    size_t dataLen = request.size();
-    std::uint8_t reply[MAX_IPMI_BUFFER];
-
     std::string expectedPath = buildPath(ifName, "rx_bytes");
 
     HandlerMock hMock;
     EXPECT_CALL(hMock, validIfNameAndField(StrEq(expectedPath)))
         .WillOnce(Return(false));
 
-    EXPECT_EQ(IPMI_CC_INVALID_FIELD_REQUEST,
-              handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
+    EXPECT_EQ(ipmi::responseInvalidFieldRequest(),
+              handleEthStatCommand(
+                  requestStruct.statId, requestStruct.if_name_len,
+                  std::vector<uint8_t>(ifName.begin(), ifName.end()), &hMock));
 }
 
 TEST(EthStatsTest, EverythingHappy)
@@ -149,14 +121,6 @@ TEST(EthStatsTest, EverythingHappy)
     requestStruct.statId = EthernetStatisticsIds::RX_BYTES;
     requestStruct.if_name_len = ifName.length();
 
-    std::vector<std::uint8_t> request(sizeof(requestStruct) + ifName.length());
-    std::memcpy(request.data(), &requestStruct, sizeof(requestStruct));
-    std::memcpy(&request[sizeof(requestStruct)], ifName.c_str(),
-                ifName.length());
-
-    size_t dataLen = request.size();
-    std::uint8_t reply[MAX_IPMI_BUFFER];
-
     std::string expectedPath = buildPath(ifName, "rx_bytes");
 
     HandlerMock hMock;
@@ -164,15 +128,23 @@ TEST(EthStatsTest, EverythingHappy)
         .WillOnce(Return(true));
     EXPECT_CALL(hMock, readStatistic(StrEq(expectedPath))).WillOnce(Return(1));
 
-    EXPECT_EQ(IPMI_CC_OK,
-              handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
-
-    struct EthStatReply expectedReply, realReply;
+    struct EthStatReply expectedReply;
     expectedReply.statId = EthernetStatisticsIds::RX_BYTES;
     expectedReply.value = 1;
 
-    std::memcpy(&realReply, reply, sizeof(realReply));
-    EXPECT_EQ(0, std::memcmp(&expectedReply, &realReply, sizeof(realReply)));
+    auto response = handleEthStatCommand(
+        requestStruct.statId, requestStruct.if_name_len,
+        std::vector<uint8_t>(ifName.begin(), ifName.end()), &hMock);
+
+    EXPECT_EQ(::ipmi::ccSuccess, std::get<0>(response));
+
+    auto data = std::get<1>(response);
+    EXPECT_TRUE(data.has_value());
+
+    auto actualStatId = std::get<0>(*data);
+    auto actualValue = std::get<1>(*data);
+    EXPECT_EQ(expectedReply.statId, actualStatId);
+    EXPECT_EQ(expectedReply.value, actualValue);
 }
 
 } // namespace ethstats
