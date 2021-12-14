@@ -18,7 +18,10 @@
 
 #include "ethstats.hpp"
 
+#include <ipmid/api-types.hpp>
+#include <ipmid/handler.hpp>
 #include <ipmid/iana.hpp>
+#include <ipmid/message.hpp>
 #include <ipmid/oemopenbmc.hpp>
 #include <ipmid/oemrouter.hpp>
 #include <stdplus/print.hpp>
@@ -27,14 +30,12 @@
 
 namespace ethstats
 {
-
 EthStats handler;
 
-static ipmi_ret_t ethStatCommand(ipmi_cmd_t cmd __attribute__((unused)),
-                                 const uint8_t* reqBuf, uint8_t* replyCmdBuf,
-                                 size_t* dataLen)
+Resp ethStatCommand(ipmi::Context::ptr ctx, uint8_t statId, uint8_t length,
+                    const std::vector<uint8_t>& data)
 {
-    return handleEthStatCommand(reqBuf, replyCmdBuf, dataLen, &handler);
+    return handleEthStatCommand(ctx, statId, length, data, &handler);
 }
 
 } // namespace ethstats
@@ -43,8 +44,6 @@ void setupGlobalOemEthStats() __attribute__((constructor));
 
 void setupGlobalOemEthStats()
 {
-    oem::Router* oemRouter = oem::mutableRouter();
-
 #if ENABLE_GOOGLE
     /* Install in Google OEM Namespace when enabled. */
     stdplus::println(
@@ -52,8 +51,9 @@ void setupGlobalOemEthStats()
         "Registering OEM:[{:#06x}], Cmd:[{:#02x}] for Ethstats Commands",
         oem::googOemNumber, std::to_underlying(oem::Cmd::ethStatsCmd));
 
-    oemRouter->registerHandler(oem::googOemNumber, oem::Cmd::ethStatsCmd,
-                               ethstats::ethStatCommand);
+    ipmi::registerOemHandler(::ipmi::prioOemBase, oem::googOemNumber,
+                             oem::Cmd::ethStatsCmd, ::ipmi::Privilege::User,
+                             ethstats::ethStatCommand);
 #endif
 
     stdplus::println(
@@ -61,6 +61,7 @@ void setupGlobalOemEthStats()
         "Registering OEM:[{:#06x}], Cmd:[{:#02x}] for Ethstats Commands",
         oem::obmcOemNumber, std::to_underlying(oem::Cmd::ethStatsCmd));
 
-    oemRouter->registerHandler(oem::obmcOemNumber, oem::Cmd::ethStatsCmd,
-                               ethstats::ethStatCommand);
+    ipmi::registerOemHandler(::ipmi::prioOemBase, oem::obmcOemNumber,
+                             oem::Cmd::ethStatsCmd, ::ipmi::Privilege::User,
+                             ethstats::ethStatCommand);
 }
