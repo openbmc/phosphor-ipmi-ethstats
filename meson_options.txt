@@ -1,0 +1,2 @@
+option('tests', type: 'feature', description: 'Build tests')
+option('enable_google', type: 'feature', description: 'Register with Google OEN')
