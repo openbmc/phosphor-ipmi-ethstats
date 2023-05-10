@@ -18,10 +18,11 @@
 
 #include "ethstats.hpp"
 
-#include <cstdio>
 #include <ipmid/iana.hpp>
 #include <ipmid/oemopenbmc.hpp>
 #include <ipmid/oemrouter.hpp>
+
+#include <cstdio>
 
 namespace ethstats
 {
