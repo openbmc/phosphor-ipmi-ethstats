@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86a8b595_f2e0419d",
+        "filename": "meson_options.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000188
+      },
+      "writtenOn": "2023-07-21T21:16:33Z",
+      "side": 1,
+      "message": "oen?",
+      "revId": "dd320eeaa86d31cafdee97f54184974355cb0775",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dace97ef_f57e65db",
+        "filename": "meson_options.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000188
+      },
+      "writtenOn": "2023-07-21T21:16:33Z",
+      "side": 1,
+      "message": "I believe this doesn\u0027t have dependencies, so it should be a bool",
+      "revId": "dd320eeaa86d31cafdee97f54184974355cb0775",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
