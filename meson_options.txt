@@ -1,0 +1,6 @@
+option(
+    'google_oan',
+    type: 'feature',
+    value: 'enabled',
+    description: 'Enable the Google OAN handler',
+)
