@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b920b996_dc848cea",
+        "filename": "meson_options.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2023-07-21T21:50:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86a8b595_f2e0419d",
+      "revId": "dd320eeaa86d31cafdee97f54184974355cb0775",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dace97ef_f57e65db",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-21T21:16:33Z",
       "side": 1,
       "message": "I believe this doesn\u0027t have dependencies, so it should be a bool",
+      "revId": "dd320eeaa86d31cafdee97f54184974355cb0775",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d245a010_ed57b006",
+        "filename": "meson_options.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2023-07-21T21:50:20Z",
+      "side": 1,
+      "message": "I don\u0027t know what you mean by this.  We use \u0027feature\u0027 over \u0027boolean\u0027 in most of our meson_options, no matter if they have a resulting dependency or not.  Is there some advantage of using \u0027boolean\u0027?  It seems like calling this out as a feature makes it more obvious to me.",
+      "parentUuid": "dace97ef_f57e65db",
       "revId": "dd320eeaa86d31cafdee97f54184974355cb0775",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
