@@ -1,0 +1,6 @@
+option(
+    'google_oen',
+    type: 'feature',
+    value: 'enabled',
+    description: 'Enable the Google OEN handler',
+)
