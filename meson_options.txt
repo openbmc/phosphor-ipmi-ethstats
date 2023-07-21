@@ -1,4 +1,10 @@
 option(
+    'tests',
+    type: 'feature',
+    value: 'enabled',
+    description: 'Build tests',
+)
+option(
     'google_oen',
     type: 'feature',
     value: 'enabled',
