@@ -45,3 +45,7 @@ ethstatscmd_lib = library(
   install: true,
   install_dir: get_option('libdir') / 'ipmid-providers',
 )
+
+if get_option('tests').allowed()
+  subdir('test')
+endif
