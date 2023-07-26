@@ -67,14 +67,4 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
                                 std::uint8_t* replyCmdBuf, size_t* dataLen,
                                 const EthStatsInterface* handler);
 
-/**
- * Given an ethernet if_name and a field, build the full path.
- *
- * @param[in] ifName - the ethernet interface's name.
- * @param[in] field - the name of the statistic
- * @return the full path of the file to read for the statistic for that
- * interface name.
- */
-std::string buildPath(const std::string& ifName, const std::string& field);
-
 } // namespace ethstats
