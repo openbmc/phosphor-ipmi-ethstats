@@ -16,42 +16,29 @@
 
 #include "handler.hpp"
 
-#include <stdplus/print.hpp>
-
-#include <cstdint>
-#include <filesystem>
-#include <fstream>
-#include <string>
+#include <stdplus/fd/create.hpp>
+#include <stdplus/fd/line.hpp>
+#include <stdplus/numeric/str.hpp>
 
 namespace ethstats
 {
 
-bool EthStats::validIfNameAndField(const std::string& path) const
+std::uint64_t EthStats::readStatistic(stdplus::const_zstring path) const
 {
-    namespace fs = std::filesystem;
-
-    // TODO: Transition to using the netlink api.
-    std::error_code ec;
-    if (!fs::exists(path, ec))
+    auto fd = stdplus::fd::open(path, stdplus::fd::OpenAccess::ReadOnly);
+    auto liner = stdplus::fd::LineReader(fd);
+    auto line = liner.readLine();
+    if (line == nullptr)
     {
-        stdplus::println(stderr, "Path: '{}' doesn't exist: {}", path,
-                         ec.message());
-        return false;
+        throw std::runtime_error("Missing stats data");
     }
-
-    return true;
-}
-
-std::uint64_t EthStats::readStatistic(const std::string& path) const
-{
-    // We know the file exists, so just read it.
-    std::uint64_t value = 0;
-    std::ifstream ifs;
-
-    ifs.open(path);
-    ifs >> value;
-
-    return value;
+    auto ret = stdplus::StrToInt<10, std::uint64_t>{}(std::string_view(*line));
+    line = liner.readLine();
+    if ((line != nullptr && !line->empty()) || liner.readLine() != nullptr)
+    {
+        throw std::runtime_error("Invalid stats data");
+    }
+    return ret;
 }
 
 } // namespace ethstats

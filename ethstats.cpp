@@ -120,14 +120,20 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
 
     std::string fullPath = buildPath(name, stat->second);
 
-    if (!handler->validIfNameAndField(fullPath))
-    {
-        return IPMI_CC_INVALID_FIELD_REQUEST;
-    }
-
     struct EthStatReply reply;
     reply.statId = request.statId;
-    reply.value = handler->readStatistic(fullPath);
+    try
+    {
+        reply.value = handler->readStatistic(fullPath);
+    }
+    catch (const std::system_error& e)
+    {
+        if (e.code() == std::errc::no_such_file_or_directory)
+        {
+            return IPMI_CC_INVALID_FIELD_REQUEST;
+        }
+        throw;
+    }
 
     // Store the result.
     std::memcpy(&replyCmdBuf[0], &reply, sizeof(reply));
