@@ -16,8 +16,9 @@
 
 #include "handler.hpp"
 
+#include <stdplus/print.hpp>
+
 #include <cstdint>
-#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -33,8 +34,8 @@ bool EthStats::validIfNameAndField(const std::string& path) const
     std::error_code ec;
     if (!fs::exists(path, ec))
     {
-        std::fprintf(stderr, "Path: '%s' doesn't exist. ec(%d, %s)\n",
-                     path.c_str(), ec.value(), ec.message().c_str());
+        stdplus::println(stderr, "Path: '{}' doesn't exist: {}", path,
+                         ec.message());
         return false;
     }
 
