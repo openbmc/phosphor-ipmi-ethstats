@@ -20,48 +20,44 @@
 
 #include <ipmid/api.h>
 
+#include <stdplus/str/cat.hpp>
+
 #include <cstdint>
 #include <cstring>
-#include <map>
-#include <sstream>
-#include <string>
+#include <string_view>
+#include <unordered_map>
 
 namespace ethstats
 {
+
+using std::literals::operator""sv;
+
 // If this changes in the future, there should be some alternative
 // source for the information if possible to provide continuined functionality.
-static const std::map<std::uint8_t, std::string> statLookup = {
-    {RX_BYTES, "rx_bytes"},
-    {RX_COMPRESSED, "rx_compressed"},
-    {RX_CRC_ERRORS, "rx_crc_errors"},
-    {RX_DROPPED, "rx_dropped"},
-    {RX_ERRORS, "rx_errors"},
-    {RX_FIFO_ERRORS, "rx_fifo_errors"},
-    {RX_FRAME_ERRORS, "rx_frame_errors"},
-    {RX_LENGTH_ERRORS, "rx_length_errors"},
-    {RX_MISSED_ERRORS, "rx_missed_errors"},
-    {RX_NOHANDLER, "rx_nohandler"},
-    {RX_OVER_ERRORS, "rx_over_errors"},
-    {RX_PACKETS, "rx_packets"},
-    {TX_ABORTED_ERRORS, "tx_aborted_errors"},
-    {TX_BYTES, "tx_bytes"},
-    {TX_CARRIER_ERRORS, "tx_carrier_errors"},
-    {TX_COMPRESSED, "tx_compressed"},
-    {TX_DROPPED, "tx_dropped"},
-    {TX_ERRORS, "tx_errors"},
-    {TX_FIFO_ERRORS, "tx_fifo_errors"},
-    {TX_HEARTBEAT_ERRORS, "tx_heartbeat_errors"},
-    {TX_PACKETS, "tx_packets"},
-    {TX_WINDOW_ERRORS, "tx_window_errors"},
+static const std::unordered_map<std::uint8_t, std::string_view> statLookup = {
+    {RX_BYTES, "rx_bytes"sv},
+    {RX_COMPRESSED, "rx_compressed"sv},
+    {RX_CRC_ERRORS, "rx_crc_errors"sv},
+    {RX_DROPPED, "rx_dropped"sv},
+    {RX_ERRORS, "rx_errors"sv},
+    {RX_FIFO_ERRORS, "rx_fifo_errors"sv},
+    {RX_FRAME_ERRORS, "rx_frame_errors"sv},
+    {RX_LENGTH_ERRORS, "rx_length_errors"sv},
+    {RX_MISSED_ERRORS, "rx_missed_errors"sv},
+    {RX_NOHANDLER, "rx_nohandler"sv},
+    {RX_OVER_ERRORS, "rx_over_errors"sv},
+    {RX_PACKETS, "rx_packets"sv},
+    {TX_ABORTED_ERRORS, "tx_aborted_errors"sv},
+    {TX_BYTES, "tx_bytes"sv},
+    {TX_CARRIER_ERRORS, "tx_carrier_errors"sv},
+    {TX_COMPRESSED, "tx_compressed"sv},
+    {TX_DROPPED, "tx_dropped"sv},
+    {TX_ERRORS, "tx_errors"sv},
+    {TX_FIFO_ERRORS, "tx_fifo_errors"sv},
+    {TX_HEARTBEAT_ERRORS, "tx_heartbeat_errors"sv},
+    {TX_PACKETS, "tx_packets"sv},
+    {TX_WINDOW_ERRORS, "tx_window_errors"sv},
 };
-
-std::string buildPath(const std::string& ifName, const std::string& field)
-{
-    std::ostringstream opath;
-    opath << "/sys/class/net/" << ifName << "/statistics/" << field;
-
-    return opath.str();
-}
 
 ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
                                 std::uint8_t* replyCmdBuf, size_t* dataLen,
@@ -104,8 +100,8 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
 
     // Copy the string out of the request buffer.
     // Maximum length is 256 bytes, excluding the nul-terminator.
-    auto name = std::string(
-        reinterpret_cast<const char*>(&reqBuf[0] + sizeof(request)), nameLen);
+    auto name = std::string_view(
+        reinterpret_cast<const char*>(reqBuf) + sizeof(request), nameLen);
 
     // Minor sanity & security check (of course, I'm less certain if unicode
     // comes into play here.
@@ -118,13 +114,12 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
         return IPMI_CC_INVALID_FIELD_REQUEST;
     }
 
-    std::string fullPath = buildPath(name, stat->second);
-
     struct EthStatReply reply;
     reply.statId = request.statId;
     try
     {
-        reply.value = handler->readStatistic(fullPath);
+        reply.value = handler->readStatistic(stdplus::strCat(
+            "/sys/class/net/"sv, name, "/statistics/"sv, stat->second));
     }
     catch (const std::system_error& e)
     {

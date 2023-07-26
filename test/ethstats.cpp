@@ -132,10 +132,9 @@ TEST(EthStatsTest, InvalidNameOrField)
     size_t dataLen = request.size();
     std::uint8_t reply[MAX_IPMI_BUFFER];
 
-    std::string expectedPath = buildPath(ifName, "rx_bytes");
-
     HandlerMock hMock;
-    EXPECT_CALL(hMock, readStatistic(Eq(expectedPath)))
+    EXPECT_CALL(hMock,
+                readStatistic(Eq("/sys/class/net/eth0/statistics/rx_bytes")))
         .WillOnce(testing::Throw(
             std::system_error(ENOENT, std::generic_category(), "")));
 
@@ -158,10 +157,10 @@ TEST(EthStatsTest, EverythingHappy)
     size_t dataLen = request.size();
     std::uint8_t reply[MAX_IPMI_BUFFER];
 
-    std::string expectedPath = buildPath(ifName, "rx_bytes");
-
     HandlerMock hMock;
-    EXPECT_CALL(hMock, readStatistic(Eq(expectedPath))).WillOnce(Return(1));
+    EXPECT_CALL(hMock,
+                readStatistic(Eq("/sys/class/net/eth0/statistics/rx_bytes")))
+        .WillOnce(Return(1));
 
     EXPECT_EQ(IPMI_CC_OK,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
