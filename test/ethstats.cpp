@@ -1,4 +1,5 @@
 #include "ethstats.hpp"
+
 #include "handler_mock.hpp"
 
 #include <cstdint>

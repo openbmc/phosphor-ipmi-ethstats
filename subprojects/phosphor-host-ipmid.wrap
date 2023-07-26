@@ -4,5 +4,3 @@ revision = HEAD
 
 [provide]
 libipmid = ipmid_dep
-libchannellayer = channellayer_dep
-libuserlayer = userlayer_dep
