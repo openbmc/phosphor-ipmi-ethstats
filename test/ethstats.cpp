@@ -11,8 +11,8 @@
 
 #define MAX_IPMI_BUFFER 64
 
+using ::testing::Eq;
 using ::testing::Return;
-using ::testing::StrEq;
 using ::testing::StrictMock;
 
 namespace ethstats
@@ -135,8 +135,9 @@ TEST(EthStatsTest, InvalidNameOrField)
     std::string expectedPath = buildPath(ifName, "rx_bytes");
 
     HandlerMock hMock;
-    EXPECT_CALL(hMock, validIfNameAndField(StrEq(expectedPath)))
-        .WillOnce(Return(false));
+    EXPECT_CALL(hMock, readStatistic(Eq(expectedPath)))
+        .WillOnce(testing::Throw(
+            std::system_error(ENOENT, std::generic_category(), "")));
 
     EXPECT_EQ(IPMI_CC_INVALID_FIELD_REQUEST,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
@@ -160,9 +161,7 @@ TEST(EthStatsTest, EverythingHappy)
     std::string expectedPath = buildPath(ifName, "rx_bytes");
 
     HandlerMock hMock;
-    EXPECT_CALL(hMock, validIfNameAndField(StrEq(expectedPath)))
-        .WillOnce(Return(true));
-    EXPECT_CALL(hMock, readStatistic(StrEq(expectedPath))).WillOnce(Return(1));
+    EXPECT_CALL(hMock, readStatistic(Eq(expectedPath))).WillOnce(Return(1));
 
     EXPECT_EQ(IPMI_CC_OK,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
