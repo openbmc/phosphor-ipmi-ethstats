@@ -18,12 +18,14 @@
 
 #include "handler.hpp"
 
+#include <endian.h>
 #include <ipmid/api.h>
 
+#include <stdplus/raw.hpp>
 #include <stdplus/str/cat.hpp>
 
 #include <cstdint>
-#include <cstring>
+#include <span>
 #include <string_view>
 #include <unordered_map>
 
@@ -63,47 +65,32 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
                                 std::uint8_t* replyCmdBuf, size_t* dataLen,
                                 const EthStatsInterface* handler)
 {
-    auto reqLength = (*dataLen);
-
-    // Verify the reqBuf is the minimum length.
-    // [0] == statistics id
-    // [1] == if_name_length
-    // [2..N] == if_name
-    // In theory the smallest can be a one-letter name. (3 bytes).
-    if (reqLength < sizeof(struct EthStatRequest) + sizeof(std::uint8_t))
+    static_assert(alignof(EthStatReply) == 1);
+    auto& reply = *reinterpret_cast<EthStatReply*>(replyCmdBuf);
+    std::string_view stat, name;
+    try
+    {
+        std::string_view req(reinterpret_cast<const char*>(reqBuf), *dataLen);
+        const auto& hdr = stdplus::raw::extractRef<EthStatRequest>(req);
+        if (hdr.if_name_len > req.size())
+        {
+            return IPMI_CC_REQ_DATA_LEN_INVALID;
+        }
+        auto it = statLookup.find(hdr.statId);
+        if (it == statLookup.end())
+        {
+            return IPMI_CC_INVALID_FIELD_REQUEST;
+        }
+        reply.statId = hdr.statId;
+        stat = it->second;
+        name = req.substr(0, hdr.if_name_len);
+    }
+    catch (...)
     {
         return IPMI_CC_REQ_DATA_LEN_INVALID;
     }
 
-    // using struct prefix due to nature as c-style pod struct.
-    struct EthStatRequest request;
-    std::memcpy(&request, &reqBuf[0], sizeof(request));
-    auto nameLen = static_cast<std::uint32_t>(request.if_name_len);
-
-    if (reqLength < (sizeof(request) + nameLen))
-    {
-        return IPMI_CC_REQ_DATA_LEN_INVALID;
-    }
-
-    // Check the statistic to see if we recognize it.
-    auto stat = statLookup.find(request.statId);
-    if (stat == statLookup.end())
-    {
-        return IPMI_CC_INVALID_FIELD_REQUEST;
-    }
-
-    // The if_name handling plus a few other things was taken from the
-    // CableCheck command implementation.
-    //
-    // Ok, so we know what statistic they want.  Let's validate their
-    // if_name.  The string is length delimited (like dns).
-
-    // Copy the string out of the request buffer.
-    // Maximum length is 256 bytes, excluding the nul-terminator.
-    auto name = std::string_view(
-        reinterpret_cast<const char*>(reqBuf) + sizeof(request), nameLen);
-
-    // Minor sanity & security check (of course, I'm less certain if unicode
+    // Minor sanity & security check. (of course, I'm less certain if unicode
     // comes into play here.
     //
     // Basically you can't easily inject ../ or /../ into the path below.
@@ -114,12 +101,10 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
         return IPMI_CC_INVALID_FIELD_REQUEST;
     }
 
-    struct EthStatReply reply;
-    reply.statId = request.statId;
     try
     {
-        reply.value = handler->readStatistic(stdplus::strCat(
-            "/sys/class/net/"sv, name, "/statistics/"sv, stat->second));
+        reply.value = htole64(handler->readStatistic(stdplus::strCat(
+            "/sys/class/net/"sv, name, "/statistics/"sv, stat)));
     }
     catch (const std::system_error& e)
     {
@@ -130,10 +115,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
         throw;
     }
 
-    // Store the result.
-    std::memcpy(&replyCmdBuf[0], &reply, sizeof(reply));
     (*dataLen) = sizeof(reply);
-
     return IPMI_CC_OK;
 }
 
