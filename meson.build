@@ -11,7 +11,10 @@ project(
 
 ethstats_pre = declare_dependency(
   include_directories: include_directories('.'),
-  dependencies: dependency('libipmid'))
+  dependencies: [
+    dependency('libipmid'),
+    dependency('stdplus'),
+  ])
 
 ethstats_lib = static_library(
   'ethstatscmd_common',
