@@ -21,6 +21,7 @@
 #include <ipmid/iana.hpp>
 #include <ipmid/oemopenbmc.hpp>
 #include <ipmid/oemrouter.hpp>
+#include <stdplus/print.hpp>
 
 #include <cstdio>
 
@@ -46,17 +47,21 @@ void setupGlobalOemEthStats()
 
 #if ENABLE_GOOGLE
     /* Install in Google OEM Namespace when enabled. */
-    std::fprintf(stderr,
-                 "Registering OEM:[%#08X], Cmd:[%#04X] for Ethstats Commands\n",
-                 oem::googOemNumber, oem::Cmd::ethStatsCmd);
+    stdplus::print(
+        stderr,
+        "Registering OEM:[{:#08x}], Cmd:[{:#04x}] for Ethstats Commands\n",
+        static_cast<oem::Number>(oem::googOemNumber),
+        static_cast<oem::Number>(oem::Cmd::ethStatsCmd));
 
     oemRouter->registerHandler(oem::googOemNumber, oem::Cmd::ethStatsCmd,
                                ethstats::ethStatCommand);
 #endif
 
-    std::fprintf(stderr,
-                 "Registering OEM:[%#08X], Cmd:[%#04X] for Ethstats Commands\n",
-                 oem::obmcOemNumber, oem::Cmd::ethStatsCmd);
+    stdplus::print(
+        stderr,
+        "Registering OEM:[{:#08x}], Cmd:[{:#04x}] for Ethstats Commands\n",
+        static_cast<oem::Number>(oem::obmcOemNumber),
+        static_cast<oem::Number>(oem::Cmd::ethStatsCmd));
 
     oemRouter->registerHandler(oem::obmcOemNumber, oem::Cmd::ethStatsCmd,
                                ethstats::ethStatCommand);

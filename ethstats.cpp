@@ -20,6 +20,8 @@
 
 #include <ipmid/api.h>
 
+#include <stdplus/print.hpp>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -77,8 +79,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     // In theory the smallest can be a one-letter name. (3 bytes).
     if (reqLength < sizeof(struct EthStatRequest) + sizeof(std::uint8_t))
     {
-        std::fprintf(stderr, "*dataLen too small: %u\n",
-                     static_cast<std::uint32_t>(reqLength));
+        stdplus::print(stderr, "*dataLen too small: {}\n", reqLength);
         return IPMI_CC_REQ_DATA_LEN_INVALID;
     }
 
@@ -89,8 +90,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
 
     if (reqLength < (sizeof(request) + nameLen))
     {
-        std::fprintf(stderr, "*dataLen too small: %u\n",
-                     static_cast<std::uint32_t>(reqLength));
+        stdplus::print(stderr, "*dataLen too small: {}\n", reqLength);
         return IPMI_CC_REQ_DATA_LEN_INVALID;
     }
 
@@ -98,7 +98,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     auto stat = statLookup.find(request.statId);
     if (stat == statLookup.end())
     {
-        std::fprintf(stderr, "stat not known: 0x%x\n", request.statId);
+        stdplus::print(stderr, "stat not known: {:#x}\n", request.statId);
         return IPMI_CC_INVALID_FIELD_REQUEST;
     }
 
@@ -121,7 +121,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     // it would limit any exposure.
     if (name.find('/') != std::string::npos)
     {
-        std::fprintf(stderr, "Invalid or illegal name: '%s'\n", name.c_str());
+        stdplus::print(stderr, "Invalid or illegal name: '{}'\n", name.c_str());
         return IPMI_CC_INVALID_FIELD_REQUEST;
     }
 
