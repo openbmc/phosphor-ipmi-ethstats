@@ -1,4 +1,4 @@
-### Ethernet Statistics Command (0x30)
+# Ethernet Statistics Command (0x30)
 
 There is the need to read a specific ethernet-level statistic value from the
 BMC. This is driven primarily to detect link errors that require hardware swaps
