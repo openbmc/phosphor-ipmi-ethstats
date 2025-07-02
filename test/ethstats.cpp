@@ -38,7 +38,7 @@ TEST(EthStatsTest, InvalidStatReturnsFailure)
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_INVALID_FIELD_REQUEST,
+    EXPECT_EQ(ipmi::ccInvalidFieldRequest,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
 }
 
@@ -64,7 +64,7 @@ TEST(EthStatsTest, InvalidIpmiPacketSize)
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_REQ_DATA_LEN_INVALID,
+    EXPECT_EQ(ipmi::ccReqDataLenInvalid,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
 }
 
@@ -89,7 +89,7 @@ TEST(EthStatsTest, InvalidIpmiPacketContents)
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_REQ_DATA_LEN_INVALID,
+    EXPECT_EQ(ipmi::ccReqDataLenInvalid,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
 }
 
@@ -112,7 +112,7 @@ TEST(EthStatsTest, NameHasIllegalCharacters)
     // Using StrictMock to ensure it isn't called.
     StrictMock<HandlerMock> hMock;
 
-    EXPECT_EQ(IPMI_CC_INVALID_FIELD_REQUEST,
+    EXPECT_EQ(ipmi::ccInvalidFieldRequest,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
 }
 
@@ -138,7 +138,7 @@ TEST(EthStatsTest, InvalidNameOrField)
     EXPECT_CALL(hMock, validIfNameAndField(StrEq(expectedPath)))
         .WillOnce(Return(false));
 
-    EXPECT_EQ(IPMI_CC_INVALID_FIELD_REQUEST,
+    EXPECT_EQ(ipmi::ccInvalidFieldRequest,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
 }
 
@@ -164,7 +164,7 @@ TEST(EthStatsTest, EverythingHappy)
         .WillOnce(Return(true));
     EXPECT_CALL(hMock, readStatistic(StrEq(expectedPath))).WillOnce(Return(1));
 
-    EXPECT_EQ(IPMI_CC_OK,
+    EXPECT_EQ(ipmi::ccSuccess,
               handleEthStatCommand(request.data(), reply, &dataLen, &hMock));
 
     struct EthStatReply expectedReply, realReply;
