@@ -2,7 +2,7 @@
 
 #include "handler.hpp"
 
-#include <ipmid/api.h>
+#include <ipmid/api-types.hpp>
 
 #include <cstdint>
 #include <string>
