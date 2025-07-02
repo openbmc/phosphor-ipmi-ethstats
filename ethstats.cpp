@@ -79,7 +79,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     {
         std::fprintf(stderr, "*dataLen too small: %u\n",
                      static_cast<std::uint32_t>(reqLength));
-        return IPMI_CC_REQ_DATA_LEN_INVALID;
+        return ipmi::ccReqDataLenInvalid;
     }
 
     // using struct prefix due to nature as c-style pod struct.
@@ -91,7 +91,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     {
         std::fprintf(stderr, "*dataLen too small: %u\n",
                      static_cast<std::uint32_t>(reqLength));
-        return IPMI_CC_REQ_DATA_LEN_INVALID;
+        return ipmi::ccReqDataLenInvalid;
     }
 
     // Check the statistic to see if we recognize it.
@@ -99,7 +99,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     if (stat == statLookup.end())
     {
         std::fprintf(stderr, "stat not known: 0x%x\n", request.statId);
-        return IPMI_CC_INVALID_FIELD_REQUEST;
+        return ipmi::ccInvalidFieldRequest;
     }
 
     // The if_name handling plus a few other things was taken from the
@@ -122,14 +122,14 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     if (name.find('/') != std::string::npos)
     {
         std::fprintf(stderr, "Invalid or illegal name: '%s'\n", name.c_str());
-        return IPMI_CC_INVALID_FIELD_REQUEST;
+        return ipmi::ccInvalidFieldRequest;
     }
 
     std::string fullPath = buildPath(name, stat->second);
 
     if (!handler->validIfNameAndField(fullPath))
     {
-        return IPMI_CC_INVALID_FIELD_REQUEST;
+        return ipmi::ccInvalidFieldRequest;
     }
 
     struct EthStatReply reply;
@@ -140,7 +140,7 @@ ipmi_ret_t handleEthStatCommand(const std::uint8_t* reqBuf,
     std::memcpy(&replyCmdBuf[0], &reply, sizeof(reply));
     (*dataLen) = sizeof(reply);
 
-    return IPMI_CC_OK;
+    return ipmi::ccSuccess;
 }
 
 } // namespace ethstats
