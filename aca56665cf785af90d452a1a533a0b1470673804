@@ -1,0 +1,8 @@
+Code-Review+1: Patrick Williams <patrick@stwcx.xyz>
+Code-Review+2: William A. Kennington III <wak@google.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Submitted-by: Jayanth Othayoth <ojayanth@gmail.com>
+Submitted-at: Wed, 15 Oct 2025 04:02:03 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-ipmi-ethstats/+/84282
+Project: openbmc/phosphor-ipmi-ethstats
+Branch: refs/heads/master
